@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\Post;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\ContactController;
@@ -37,6 +38,12 @@ Route::group(['namespace' => 'App\Http\Controllers\Post'], function () {
     Route::get('/posts/{post}/edit', [EditController::class, '__invoke'])->name('post.edit');
     Route::patch('/posts/{post}', [UpdateController::class, '__invoke'])->name('post.update');
     Route::delete('/posts/{post}', [DestroyController::class, '__invoke'])->name('post.delete');
+});
+
+Route::group(['namespace' => 'App\Http\Controllers\Admin', 'prefix' => 'admin'], function () {
+    Route::group(['namespace' => 'Post'], function () {
+        Route::get('/post', [Post\IndexController::class, '__invoke'])->name('admin.post.index');
+    });
 });
 
 
