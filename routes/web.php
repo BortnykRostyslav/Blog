@@ -26,7 +26,7 @@ use App\Http\Controllers\Post\DestroyController;
 |
 */
 
-Route::get('/', [HomeController::class, 'index']);
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 
 Route::group(['namespace' => 'App\Http\Controllers\Post'], function () {
@@ -40,7 +40,7 @@ Route::group(['namespace' => 'App\Http\Controllers\Post'], function () {
     Route::delete('/posts/{post}', [DestroyController::class, '__invoke'])->name('post.delete');
 });
 
-Route::group(['namespace' => 'App\Http\Controllers\Admin', 'prefix' => 'admin'], function () {
+Route::group(['namespace' => 'App\Http\Controllers\Admin', 'prefix' => 'admin', 'middleware' => 'admin'], function () {
     Route::group(['namespace' => 'Post'], function () {
         Route::get('/post', [Post\IndexController::class, '__invoke'])->name('admin.post.index');
     });
