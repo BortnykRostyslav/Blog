@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Admin\Post;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\MainController;
@@ -25,9 +26,8 @@ use App\Http\Controllers\Post\DestroyController;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [HomeController::class, 'index']);
+
 
 Route::group(['namespace' => 'App\Http\Controllers\Post'], function () {
     Route::get('/posts', [IndexController::class, '__invoke'])->name('post.index');
@@ -55,3 +55,7 @@ Route::get('/posts/update_or_create', [PostController::class, 'UpdateOrCreate'])
 Route::get('/main', [MainController::class, 'index'])->name('main.index');
 Route::get('/contacts', [ContactController::class, 'index'])->name('contact.index');
 Route::get('/about', [AboutController::class, 'index'])->name('about.index');
+
+Auth::routes();
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
