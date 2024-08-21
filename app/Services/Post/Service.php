@@ -19,7 +19,6 @@ class Service
             unset($data['tags'],$data['category']);
 
             $tagIds = $this->getTagIds($tags);
-
             $data['category_id'] = $this->getCategoryId($category);;
 
             $post = Post::create($data);
@@ -38,11 +37,24 @@ class Service
 
     public function update($post, $data)
     {
-        $tags = $data['tags'];
-        unset($data['tags']);
+        try {
+            DB::beginTransaction();
 
-        $post->update($data);
-        $post->tags()->sync($tags);
+            $tags = $data['tags'];
+            $category = $data['category'];
+            unset($data['tags'],$data['category']);
+
+            $tagIds = $this->getTagIdsWithUpdate($tags);
+            $data['category_id'] = $this->getCategoryIdWithUpdate($category);;
+
+            $post->update($data);
+            $post->tags()->sync($tagIds);
+
+
+        } catch (\Exception $exception){
+            DB::rollBack();
+            return $exception->getMessage();
+        }
         return $post->fresh();
     }
 
@@ -52,12 +64,40 @@ class Service
         return $category->id;
     }
 
+    private function getCategoryIdWithUpdate($item)
+    {
+        if(!isset($item['id'])){
+            $category = Category::create($item);
+        } else {
+            $category = Category::find($item['id']);
+            $category->update($item);
+            $category = $category->fresh();
+        }
+        return $category->id;
+    }
+
     private function getTagIds($tags)
     {
         $tagIds = [];
         foreach ($tags as $tag) {
 
             $tag = !isset($tag['id']) ? Tag::create($tag) :Tag::find($tag['id']);
+            $tagIds[] = $tag->id;
+        }
+        return $tagIds;
+    }
+
+    private function getTagIdsWithUpdate($tags)
+    {
+        $tagIds = [];
+        foreach ($tags as $tag) {
+            if (!isset($tag['id'])) {
+                $tag = Tag::create($tag);
+            } else {
+                $currentTag = Tag::find($tag['id']);
+                $currentTag->update($tag);
+                $tag = $currentTag->fresh();
+            }
             $tagIds[] = $tag->id;
         }
         return $tagIds;
