@@ -29,6 +29,13 @@ Route::prefix('auth')->middleware('api')->group(function () {
 
 Route::group(['namespace' => 'App\Http\Controllers\Post', 'middleware' => 'jwt.auth'], function () {
     Route::get('/posts', 'IndexController');
+    Route::get('/posts/create', 'CreateController');
+
+    Route::post('/posts', 'StoreController');
+    Route::get('/posts/{post}', 'ShowController');
+    Route::get('/posts/{post}/edit', 'EditController');
+    Route::patch('/posts/{post}', 'UpdateController');
+    Route::delete('/posts/{post}', 'DestroyController');
 });
 
 
