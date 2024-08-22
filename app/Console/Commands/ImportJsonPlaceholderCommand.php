@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Components\ImportDataClient;
+use App\Models\Post;
 use Illuminate\Console\Command;
 
 class ImportJsonPlaceholderCommand extends Command
@@ -14,8 +15,18 @@ class ImportJsonPlaceholderCommand extends Command
 
     public function handle()
     {
-        $client = new ImportDataClient();
-        $response = $client->request('GET', 'posts');
-        dd($response);
+        $import = new ImportDataClient();
+        $response = $import->client->request('GET', 'posts');
+        $data = json_decode($response->getBody()->getContents());
+
+        foreach ($data as $item) {
+            Post::firstOrCreate([
+                'title' => $item->title,
+            ],[
+                'title' => $item->title,
+                'content' => $item->body,
+                'category_id' => 2,
+            ]);
+        }
     }
 }
